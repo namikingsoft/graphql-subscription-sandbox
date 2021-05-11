@@ -1,0 +1,21 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Message {
+  id: ID!
+  text: String!
+  createdAt: Float!
+}
+
+type Query {
+  messages: [Message!]!
+}
+
+type Mutation {
+  postMessage(messageInput: MessageInput!): Message!
+}
+
+input MessageInput {
+  text: String!
+}

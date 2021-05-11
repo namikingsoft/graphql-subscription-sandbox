@@ -1,7 +1,7 @@
-import { MessageModel } from './message.model';
+import { Message } from './message.model';
 
-describe('MessageModel', () => {
+describe('Message', () => {
   it('should be defined', () => {
-    expect(new MessageModel()).toBeDefined();
+    expect(new Message()).toBeDefined();
   });
 });
