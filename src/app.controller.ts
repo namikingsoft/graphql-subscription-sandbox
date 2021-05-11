@@ -1,12 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res, Req, Next } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('/')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('*')
+  static(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ) {
+    if (req.path === '/graphql') return next();
+    const handle = this.appService.getNextServer().getRequestHandler();
+    handle(req, res);
   }
 }
