@@ -19,3 +19,7 @@ type Mutation {
 input MessageInput {
   text: String!
 }
+
+type Subscription {
+  messageAdded: Message!
+}

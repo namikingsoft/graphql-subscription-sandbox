@@ -40,6 +40,22 @@ export type Query = {
   messages: Array<Message>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  messageAdded: Message;
+};
+
+export type MessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MessageAddedSubscription = (
+  { __typename?: 'Subscription' }
+  & { messageAdded: (
+    { __typename?: 'Message' }
+    & Pick<Message, 'id' | 'text' | 'createdAt'>
+  ) }
+);
+
 export type MessagesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -65,6 +81,37 @@ export type PostMessageMutation = (
 );
 
 
+export const MessageAddedDocument = gql`
+    subscription MessageAdded {
+  messageAdded {
+    id
+    text
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useMessageAddedSubscription__
+ *
+ * To run a query within a React component, call `useMessageAddedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMessageAddedSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMessageAddedSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMessageAddedSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MessageAddedSubscription, MessageAddedSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<MessageAddedSubscription, MessageAddedSubscriptionVariables>(MessageAddedDocument, options);
+      }
+export type MessageAddedSubscriptionHookResult = ReturnType<typeof useMessageAddedSubscription>;
+export type MessageAddedSubscriptionResult = Apollo.SubscriptionResult<MessageAddedSubscription>;
 export const MessagesDocument = gql`
     query Messages {
   messages {

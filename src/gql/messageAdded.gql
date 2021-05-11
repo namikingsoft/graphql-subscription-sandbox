@@ -1,0 +1,7 @@
+subscription MessageAdded {
+  messageAdded {
+    id
+    text
+    createdAt
+  }
+}

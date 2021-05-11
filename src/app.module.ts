@@ -10,6 +10,7 @@ import { MessageModule } from './message/message.module';
     TypeOrmModule.forRoot(),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
+      installSubscriptionHandlers: true,
     }),
     MessageModule,
   ],
