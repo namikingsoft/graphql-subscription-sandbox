@@ -1,0 +1,12 @@
+schema:
+  - ./schema.gql:
+generates:
+  ./src/client/lib/api.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    documents:
+      - 'src/gql/*.gql'
+    config:
+      withHooks: true
