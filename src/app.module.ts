@@ -11,6 +11,10 @@ import { MessageModule } from './message/message.module';
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
       installSubscriptionHandlers: true,
+      // For test on production
+      // https://www.apollographql.com/docs/apollo-server/testing/graphql-playground/#enabling-graphql-playground-in-production
+      playground: true,
+      introspection: true,
     }),
     MessageModule,
   ],
