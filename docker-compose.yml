@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    command: sh -c 'npm run typeorm -- migration:run && npm run start:prod'
+    # created by elastic beanstalk
+    # refs. https://docs.aws.amazon.com/ja_jp/elasticbeanstalk/latest/dg/create_deploy_docker.container.console.html
+    env_file:
+      - .env
