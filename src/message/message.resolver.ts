@@ -1,10 +1,15 @@
 import { Resolver, Args, Query, Mutation, Subscription } from '@nestjs/graphql';
-import { PubSub } from 'apollo-server-express';
+import { PostgresPubSub } from 'graphql-postgres-subscriptions';
+import { Client } from 'pg';
 import { MessageService } from './message.service';
 import { Message } from './message.model';
 import { MessageInput } from './dto/message.input';
+import * as ormconfig from '../../ormconfig';
 
-const pubSub = new PubSub();
+// TODO: Dependency Injection
+const client = new Client({ connectionString: ormconfig.url });
+client.connect();
+const pubSub = new PostgresPubSub({ client });
 
 @Resolver()
 export class MessageResolver {
@@ -17,7 +22,7 @@ export class MessageResolver {
 
   @Mutation(() => Message)
   async postMessage(@Args('messageInput') messageInput: MessageInput) {
-    const message = this.messageService.save(messageInput);
+    const message = await this.messageService.save(messageInput);
     pubSub.publish('messageAdded', { messageAdded: message });
     return message;
   }
