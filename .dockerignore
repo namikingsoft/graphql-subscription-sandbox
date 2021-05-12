@@ -7,4 +7,5 @@ docker-compose.yml
 .gitignore
 .dockerignore
 .ebignore
+.elasticbeanstalk
 **/.env*
