@@ -13,7 +13,7 @@ export class AppController {
     @Next() next: NextFunction,
   ) {
     if (req.path === '/graphql') return next();
-    const handle = this.appService.getNextServer().getRequestHandler();
+    const handle = this.appService.getNextRequestHandler();
     handle(req, res);
   }
 }

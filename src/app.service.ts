@@ -20,7 +20,7 @@ export class AppService implements OnModuleInit {
     }
   }
 
-  getNextServer(): NextServer {
-    return this.server;
+  getNextRequestHandler() {
+    return this.server.getRequestHandler();
   }
 }
