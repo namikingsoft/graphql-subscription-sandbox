@@ -10,18 +10,21 @@ import {
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { CssBaseline, createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { deriveWebSocketPathToAbsolute } from '../lib/utils';
 
 const theme = createMuiTheme({});
 
+const graphqlPath = '/graphql';
+
 const httpLink = new HttpLink({
-  uri: '/graphql',
+  uri: graphqlPath,
 });
 
 const wsLink =
   // NOTE: implement websocket only client
   process.browser &&
   new WebSocketLink({
-    uri: 'ws://localhost:3000/graphql',
+    uri: deriveWebSocketPathToAbsolute(graphqlPath),
     options: {
       reconnect: true,
     },
