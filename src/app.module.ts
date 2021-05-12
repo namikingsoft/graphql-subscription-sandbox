@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PubsubModule } from './pubsub/pubsub.module';
 import { MessageModule } from './message/message.module';
 
 @Module({
@@ -16,6 +17,7 @@ import { MessageModule } from './message/message.module';
       playground: true,
       introspection: true,
     }),
+    PubsubModule,
     MessageModule,
   ],
   controllers: [AppController],
