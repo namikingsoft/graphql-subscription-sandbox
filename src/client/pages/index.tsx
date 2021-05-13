@@ -1,22 +1,10 @@
-import React, { FormEvent } from 'react';
+import React from 'react';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import {
-  makeStyles,
-  Container,
-  FormControl,
-  InputLabel,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-} from '@material-ui/core';
-import { Image } from '@material-ui/icons/';
+import { makeStyles, Container, Grid } from '@material-ui/core';
+import { InputMessage } from '../components/InputMessage';
+import { SelectRoom } from '../components/SelectRoom';
+import { MessageList } from '../components/MessageList';
 import {
   Room,
   useRoomsQuery,
@@ -26,9 +14,33 @@ import {
   useMessageAddedSubscription,
 } from '../lib/api';
 
-const useStyles = makeStyles((theme) => ({
+type MessageAction =
+  | {
+      type: 'add';
+      payload: Message;
+    }
+  | {
+      type: 'set';
+      payload: Message[];
+    };
+
+const reduceMessages: React.Reducer<Message[], MessageAction> = (
+  state,
+  action,
+) => {
+  switch (action.type) {
+    case 'add':
+      return [action.payload, ...state];
+    case 'set':
+      return [...action.payload].reverse();
+    default:
+      return state;
+  }
+};
+
+const useStyles = makeStyles(() => ({
   root: {
-    marginTop: theme.spacing(5),
+    marginTop: 20,
   },
 }));
 
@@ -36,23 +48,17 @@ const Home: NextPage = () => {
   const classes = useStyles();
 
   const [roomId, setRoomId] = React.useState<Room['id']>('');
-  const [messages, setMessages] = React.useState([] as Message[]);
-  const [text, setText] = React.useState('');
+  const [messages, dispatchMessage] = React.useReducer(reduceMessages, []);
 
   const resultRooms = useRoomsQuery({ fetchPolicy: 'network-only' });
   const resultMessages = useMessagesQuery({
     fetchPolicy: roomId ? 'network-only' : 'cache-only',
     variables: { roomId },
   });
-  const resultMessageAdded = useMessageAddedSubscription({
-    fetchPolicy: roomId ? 'network-only' : 'cache-only',
-    variables: { roomId },
-  });
   const [postMessage, resultPostMessage] = usePostMessageMutation();
 
   const onSubmit = React.useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
+    (text: Message['text']) => {
       postMessage({
         variables: {
           messageInput: {
@@ -62,8 +68,15 @@ const Home: NextPage = () => {
         },
       });
     },
-    [text, postMessage],
+    [postMessage, roomId],
   );
+
+  useMessageAddedSubscription({
+    variables: { roomId },
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      dispatchMessage({ type: 'add', payload: data.messageAdded });
+    },
+  });
 
   React.useEffect(() => {
     if (resultRooms.data) {
@@ -73,69 +86,34 @@ const Home: NextPage = () => {
 
   React.useEffect(() => {
     if (resultMessages.data) {
-      setMessages([...resultMessages.data.messages].reverse());
+      dispatchMessage({ type: 'set', payload: resultMessages.data.messages });
     }
   }, [resultMessages.data]);
-
-  React.useEffect(() => {
-    if (!(resultPostMessage.loading || resultPostMessage.error)) {
-      setText('');
-    }
-  }, [resultPostMessage.loading]);
-
-  React.useEffect(() => {
-    if (resultMessageAdded.data) {
-      setMessages([resultMessageAdded.data.messageAdded, ...messages]);
-    }
-  }, [resultMessageAdded.data?.messageAdded.id]);
 
   return (
     <div className={classes.root}>
       <Head>
-        <title>App</title>
+        <title>GraphQL subscription sandbox</title>
       </Head>
-      <Container>
-        <FormControl>
-          <InputLabel shrink>Room</InputLabel>
-          <Select
-            value={roomId}
-            onChange={({ target }) => setRoomId(target.value as string)}
-          >
-            {(resultRooms.data?.rooms ?? []).map((room) => (
-              <MenuItem value={room.id}>{room.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <List>
-          {messages.map((message) => (
-            <ListItem key={message.id}>
-              <ListItemAvatar>
-                <Avatar>
-                  <Image />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={message.text}
-                secondary={String(new Date(message.createdAt))}
-              />
-            </ListItem>
-          ))}
-        </List>
-        <form onSubmit={onSubmit}>
-          <TextField
-            label="Message"
-            value={text}
-            onChange={({ target }) => setText(target.value)}
-          />
-          <Button
-            type="submit"
-            color="primary"
-            variant="contained"
-            disabled={resultPostMessage.loading}
-          >
-            Post
-          </Button>
-        </form>
+      <Container maxWidth="md">
+        <Grid container spacing={3}>
+          <Grid item xs={8}>
+            <InputMessage
+              onSubmit={onSubmit}
+              loading={resultPostMessage.loading}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <SelectRoom
+              rooms={resultRooms.data?.rooms ?? []}
+              value={roomId}
+              onChange={setRoomId}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <MessageList messages={messages} />
+          </Grid>
+        </Grid>
       </Container>
     </div>
   );
