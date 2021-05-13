@@ -1,5 +1,5 @@
-query Messages {
-  messages {
+query Messages($roomId: ID!) {
+  messages(roomId: $roomId) {
     id
     text
     createdAt

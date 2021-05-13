@@ -17,14 +17,14 @@ export class RoomResolver {
   }
 
   @Mutation(() => Room)
-  async postRoom(@Args('RoomInput') roomInput: RoomInput) {
+  async postRoom(@Args('roomInput') roomInput: RoomInput) {
     const room = await this.roomService.save(roomInput);
-    this.pubsubService.publish('roomAdded', { roomAdded: room });
+    this.pubsubService.publish('/roomAdded', { roomAdded: room });
     return room;
   }
 
   @Subscription(() => Room)
-  RoomAdded() {
-    return this.pubsubService.asyncIterator('roomAdded');
+  roomAdded() {
+    return this.pubsubService.asyncIterator('/roomAdded');
   }
 }

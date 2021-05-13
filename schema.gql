@@ -8,18 +8,32 @@ type Message {
   createdAt: Float!
 }
 
+type Room {
+  id: ID!
+  name: String!
+  createdAt: Float!
+}
+
 type Query {
-  messages: [Message!]!
+  messages(roomId: ID!): [Message!]!
+  rooms: [Room!]!
 }
 
 type Mutation {
   postMessage(messageInput: MessageInput!): Message!
+  postRoom(roomInput: RoomInput!): Room!
 }
 
 input MessageInput {
   text: String!
+  roomId: ID!
+}
+
+input RoomInput {
+  name: String!
 }
 
 type Subscription {
-  messageAdded: Message!
+  messageAdded(roomId: ID!): Message!
+  roomAdded: Room!
 }

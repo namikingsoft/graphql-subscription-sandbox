@@ -9,7 +9,6 @@ export class AppService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     try {
-      console.log('NODE_ENV', process.env.NODE_ENV);
       this.server = next({
         dev: process.env.NODE_ENV !== 'production',
         dir: './src/client',

@@ -23,11 +23,13 @@ export type Message = {
 
 export type MessageInput = {
   text: Scalars['String'];
+  roomId: Scalars['ID'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   postMessage: Message;
+  postRoom: Room;
 };
 
 
@@ -35,17 +37,47 @@ export type MutationPostMessageArgs = {
   messageInput: MessageInput;
 };
 
+
+export type MutationPostRoomArgs = {
+  roomInput: RoomInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   messages: Array<Message>;
+  rooms: Array<Room>;
+};
+
+
+export type QueryMessagesArgs = {
+  roomId: Scalars['ID'];
+};
+
+export type Room = {
+  __typename?: 'Room';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  createdAt: Scalars['Float'];
+};
+
+export type RoomInput = {
+  name: Scalars['String'];
 };
 
 export type Subscription = {
   __typename?: 'Subscription';
   messageAdded: Message;
+  roomAdded: Room;
 };
 
-export type MessageAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+export type SubscriptionMessageAddedArgs = {
+  roomId: Scalars['ID'];
+};
+
+export type MessageAddedSubscriptionVariables = Exact<{
+  roomId: Scalars['ID'];
+}>;
 
 
 export type MessageAddedSubscription = (
@@ -56,7 +88,9 @@ export type MessageAddedSubscription = (
   ) }
 );
 
-export type MessagesQueryVariables = Exact<{ [key: string]: never; }>;
+export type MessagesQueryVariables = Exact<{
+  roomId: Scalars['ID'];
+}>;
 
 
 export type MessagesQuery = (
@@ -80,10 +114,21 @@ export type PostMessageMutation = (
   ) }
 );
 
+export type RoomsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RoomsQuery = (
+  { __typename?: 'Query' }
+  & { rooms: Array<(
+    { __typename?: 'Room' }
+    & Pick<Room, 'id' | 'name' | 'createdAt'>
+  )> }
+);
+
 
 export const MessageAddedDocument = gql`
-    subscription MessageAdded {
-  messageAdded {
+    subscription MessageAdded($roomId: ID!) {
+  messageAdded(roomId: $roomId) {
     id
     text
     createdAt
@@ -103,18 +148,19 @@ export const MessageAddedDocument = gql`
  * @example
  * const { data, loading, error } = useMessageAddedSubscription({
  *   variables: {
+ *      roomId: // value for 'roomId'
  *   },
  * });
  */
-export function useMessageAddedSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MessageAddedSubscription, MessageAddedSubscriptionVariables>) {
+export function useMessageAddedSubscription(baseOptions: Apollo.SubscriptionHookOptions<MessageAddedSubscription, MessageAddedSubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useSubscription<MessageAddedSubscription, MessageAddedSubscriptionVariables>(MessageAddedDocument, options);
       }
 export type MessageAddedSubscriptionHookResult = ReturnType<typeof useMessageAddedSubscription>;
 export type MessageAddedSubscriptionResult = Apollo.SubscriptionResult<MessageAddedSubscription>;
 export const MessagesDocument = gql`
-    query Messages {
-  messages {
+    query Messages($roomId: ID!) {
+  messages(roomId: $roomId) {
     id
     text
     createdAt
@@ -134,10 +180,11 @@ export const MessagesDocument = gql`
  * @example
  * const { data, loading, error } = useMessagesQuery({
  *   variables: {
+ *      roomId: // value for 'roomId'
  *   },
  * });
  */
-export function useMessagesQuery(baseOptions?: Apollo.QueryHookOptions<MessagesQuery, MessagesQueryVariables>) {
+export function useMessagesQuery(baseOptions: Apollo.QueryHookOptions<MessagesQuery, MessagesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MessagesQuery, MessagesQueryVariables>(MessagesDocument, options);
       }
@@ -183,3 +230,39 @@ export function usePostMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type PostMessageMutationHookResult = ReturnType<typeof usePostMessageMutation>;
 export type PostMessageMutationResult = Apollo.MutationResult<PostMessageMutation>;
 export type PostMessageMutationOptions = Apollo.BaseMutationOptions<PostMessageMutation, PostMessageMutationVariables>;
+export const RoomsDocument = gql`
+    query Rooms {
+  rooms {
+    id
+    name
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useRoomsQuery__
+ *
+ * To run a query within a React component, call `useRoomsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRoomsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRoomsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRoomsQuery(baseOptions?: Apollo.QueryHookOptions<RoomsQuery, RoomsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RoomsQuery, RoomsQueryVariables>(RoomsDocument, options);
+      }
+export function useRoomsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RoomsQuery, RoomsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RoomsQuery, RoomsQueryVariables>(RoomsDocument, options);
+        }
+export type RoomsQueryHookResult = ReturnType<typeof useRoomsQuery>;
+export type RoomsLazyQueryHookResult = ReturnType<typeof useRoomsLazyQuery>;
+export type RoomsQueryResult = Apollo.QueryResult<RoomsQuery, RoomsQueryVariables>;

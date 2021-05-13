@@ -4,8 +4,12 @@ import Head from 'next/head';
 import {
   makeStyles,
   Container,
+  FormControl,
+  InputLabel,
   TextField,
   Button,
+  Select,
+  MenuItem,
   List,
   ListItem,
   ListItemText,
@@ -14,6 +18,8 @@ import {
 } from '@material-ui/core';
 import { Image } from '@material-ui/icons/';
 import {
+  Room,
+  useRoomsQuery,
   Message,
   useMessagesQuery,
   usePostMessageMutation,
@@ -29,26 +35,46 @@ const useStyles = makeStyles((theme) => ({
 const Home: NextPage = () => {
   const classes = useStyles();
 
-  const resultMessages = useMessagesQuery();
-  const resultMessageAdded = useMessageAddedSubscription();
-  const [postMessage, resultPostMessage] = usePostMessageMutation();
-
+  const [roomId, setRoomId] = React.useState<Room['id']>('');
   const [messages, setMessages] = React.useState([] as Message[]);
   const [text, setText] = React.useState('');
+
+  const resultRooms = useRoomsQuery({ fetchPolicy: 'network-only' });
+  const resultMessages = useMessagesQuery({
+    fetchPolicy: roomId ? 'network-only' : 'cache-only',
+    variables: { roomId },
+  });
+  const resultMessageAdded = useMessageAddedSubscription({
+    variables: { roomId },
+  });
+  const [postMessage, resultPostMessage] = usePostMessageMutation();
 
   const onSubmit = React.useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      postMessage({ variables: { messageInput: { text } } });
+      postMessage({
+        variables: {
+          messageInput: {
+            text,
+            roomId,
+          },
+        },
+      });
     },
     [text, postMessage],
   );
 
   React.useEffect(() => {
-    if (resultMessages.data) {
-      setMessages(resultMessages.data.messages);
+    if (resultRooms.data) {
+      setRoomId(resultRooms.data?.rooms[0]?.id ?? '');
     }
-  }, [resultMessages.loading]);
+  }, [resultRooms.data]);
+
+  React.useEffect(() => {
+    if (resultMessages.data) {
+      setMessages([...resultMessages.data.messages].reverse());
+    }
+  }, [resultMessages.data]);
 
   React.useEffect(() => {
     if (!(resultPostMessage.loading || resultPostMessage.error)) {
@@ -58,7 +84,7 @@ const Home: NextPage = () => {
 
   React.useEffect(() => {
     if (resultMessageAdded.data) {
-      setMessages([...messages, resultMessageAdded.data.messageAdded]);
+      setMessages([resultMessageAdded.data.messageAdded, ...messages]);
     }
   }, [resultMessageAdded.data?.messageAdded.id]);
 
@@ -68,6 +94,17 @@ const Home: NextPage = () => {
         <title>App</title>
       </Head>
       <Container>
+        <FormControl>
+          <InputLabel shrink>Room</InputLabel>
+          <Select
+            value={roomId}
+            onChange={({ target }) => setRoomId(target.value as string)}
+          >
+            {(resultRooms.data?.rooms ?? []).map((room) => (
+              <MenuItem value={room.id}>{room.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <List>
           {messages.map((message) => (
             <ListItem key={message.id}>
@@ -85,7 +122,7 @@ const Home: NextPage = () => {
         </List>
         <form onSubmit={onSubmit}>
           <TextField
-            label="Standard"
+            label="Message"
             value={text}
             onChange={({ target }) => setText(target.value)}
           />
