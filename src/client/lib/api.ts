@@ -114,6 +114,17 @@ export type PostMessageMutation = (
   ) }
 );
 
+export type RoomAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RoomAddedSubscription = (
+  { __typename?: 'Subscription' }
+  & { roomAdded: (
+    { __typename?: 'Room' }
+    & Pick<Room, 'id' | 'name' | 'createdAt'>
+  ) }
+);
+
 export type RoomsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -230,6 +241,37 @@ export function usePostMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type PostMessageMutationHookResult = ReturnType<typeof usePostMessageMutation>;
 export type PostMessageMutationResult = Apollo.MutationResult<PostMessageMutation>;
 export type PostMessageMutationOptions = Apollo.BaseMutationOptions<PostMessageMutation, PostMessageMutationVariables>;
+export const RoomAddedDocument = gql`
+    subscription RoomAdded {
+  roomAdded {
+    id
+    name
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useRoomAddedSubscription__
+ *
+ * To run a query within a React component, call `useRoomAddedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useRoomAddedSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRoomAddedSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRoomAddedSubscription(baseOptions?: Apollo.SubscriptionHookOptions<RoomAddedSubscription, RoomAddedSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<RoomAddedSubscription, RoomAddedSubscriptionVariables>(RoomAddedDocument, options);
+      }
+export type RoomAddedSubscriptionHookResult = ReturnType<typeof useRoomAddedSubscription>;
+export type RoomAddedSubscriptionResult = Apollo.SubscriptionResult<RoomAddedSubscription>;
 export const RoomsDocument = gql`
     query Rooms {
   rooms {

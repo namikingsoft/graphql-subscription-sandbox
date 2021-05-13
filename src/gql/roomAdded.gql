@@ -1,0 +1,7 @@
+subscription RoomAdded {
+  roomAdded {
+    id
+    name
+    createdAt
+  }
+}

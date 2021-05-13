@@ -45,6 +45,7 @@ const Home: NextPage = () => {
     variables: { roomId },
   });
   const resultMessageAdded = useMessageAddedSubscription({
+    fetchPolicy: roomId ? 'network-only' : 'cache-only',
     variables: { roomId },
   });
   const [postMessage, resultPostMessage] = usePostMessageMutation();
