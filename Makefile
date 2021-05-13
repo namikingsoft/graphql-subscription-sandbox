@@ -1,5 +1,7 @@
 DATABASE_URI ?= postgres://postgres:postgres@localhost:5432/postgres
 
+all: src/client/lib/api.ts
+
 up-middleware:
 	docker-compose -f docker-compose.middleware.yml up -d
 
@@ -11,10 +13,10 @@ psql:
 	  exec database psql "$(DATABASE_URI)"
 
 create:
-	rm -f .elasticbeanstalk/config.yml ;\
+	rm -f .elasticbeanstalk/config.yml
 	eb init \
 	  --region ap-northeast-1 \
-	  --platform "Docker running on 64bit Amazon Linux 2" ;\
+	  --platform "Docker running on 64bit Amazon Linux 2"
 	eb create \
 	  --database \
 	  --database.engine postgres \
