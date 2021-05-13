@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PubsubModule } from './pubsub/pubsub.module';
 import { MessageModule } from './message/message.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MessageModule } from './message/message.module';
     }),
     PubsubModule,
     MessageModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],

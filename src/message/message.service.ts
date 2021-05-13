@@ -26,7 +26,7 @@ export class MessageService {
     return { ...entity, createdAt: entity.createdAt.getTime() };
   }
 
-  static mapToEntity(model: MessageEntity): MessageEntity {
+  static mapToEntity(model: Message): MessageEntity {
     return { ...model, createdAt: new Date(model.createdAt) };
   }
 }
