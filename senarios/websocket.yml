@@ -1,10 +1,9 @@
 config:
-  # target: 'wss://dgjntfbd78u8i.cloudfront.net/graphql'
   target: 'ws://localhost:3000/graphql'
   phases:
     - duration: 60 # Test for 60 seconds
       arrivalRate: 10 # Every second, add 10 users
-      rampTo: 100 # And ramp it up to 100 users in total over the 60s period
+      rampTo: 1000 # And ramp it up to 1000 users in total over the 60s period
       name: 'Ramping up the load'
   ws:
     # Set a custom subprotocol:
@@ -18,7 +17,7 @@ scenarios:
       # - send:
       #     type: connection_init
       #     payload: {}
-      # NOTE: Subscribe
+      # NOTE: Subscribe roomAdded
       - send:
           id: 1
           type: start
@@ -27,9 +26,22 @@ scenarios:
             extensions: {}
             operationName: RoomAdded
             query: "subscription RoomAdded {\n  roomAdded {\n    id\n    name\n    createdAt\n    __typename\n  }\n}\n"
+      # NOTE: Subscribe messageAdded
+      # - send:
+      #     id: 2
+      #     type: start
+      #     payload:
+      #       variables:
+      #         roomId: 366a443f-1bff-4144-b812-fa93fdaa4d2c
+      #       extensions: {}
+      #       operationName: MessageAdded
+      #       query: "subscription MessageAdded($roomId: ID!) {\n  messageAdded(roomId: $roomId) {\n    id\n    text\n    createdAt\n    __typename\n  }\n}\n"
       # NOTE: Wait 30 sec
       - think: 30
       # NOTE: Unsubscribe
+      # - send:
+      #     id: 2
+      #     type: stop
       - send:
           id: 1
           type: stop
