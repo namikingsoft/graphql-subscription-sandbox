@@ -1,22 +1,24 @@
 config:
+  # target: 'wss://dgjntfbd78u8i.cloudfront.net/graphql'
   target: 'ws://localhost:3000/graphql'
   phases:
-    - duration: 10 # Test for 10 seconds
+    - duration: 60 # Test for 60 seconds
       arrivalRate: 10 # Every second, add 10 users
-      # rampTo: 100    # And ramp it up to 100 users in total over the 60s period
+      rampTo: 100 # And ramp it up to 100 users in total over the 60s period
       name: 'Ramping up the load'
   ws:
     # Set a custom subprotocol:
     subprotocols:
-      # npm install -g artillery-engine-graphql-ws
       - graphql-ws
 scenarios:
   - name: load testing subscription
     engine: ws
     flow:
+      # NOTE: Init connection (include graphql-ws)
       # - send:
       #     type: connection_init
       #     payload: {}
+      # NOTE: Subscribe
       - send:
           id: 1
           type: start
@@ -25,7 +27,9 @@ scenarios:
             extensions: {}
             operationName: RoomAdded
             query: "subscription RoomAdded {\n  roomAdded {\n    id\n    name\n    createdAt\n    __typename\n  }\n}\n"
-      - think: 15
+      # NOTE: Wait 30 sec
+      - think: 30
+      # NOTE: Unsubscribe
       - send:
           id: 1
           type: stop
