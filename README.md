@@ -35,6 +35,8 @@ $ npm run start:prod
 
 ## Deploy to AWS
 
+Install awscli and ebcli.
+
 ```bash
 # export aws keypar
 $ export AWS_ACCESS_KEY_ID="xxxx"
@@ -46,6 +48,9 @@ $ make create
 
 # Deploy only
 $ make deploy
+
+# Scale out
+$ eb scale 3
 ```
 
 ## Test
