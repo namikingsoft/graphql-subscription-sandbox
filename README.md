@@ -1,6 +1,6 @@
 # Sandbox of GraphQL subscription
 
-Powered by [Nest](https://github.com/nestjs/nest) on AWS Beanstalk.
+Powered by [Nest](https://github.com/nestjs/nest) on AWS Elastic Beanstalk.
 
 ![subscription](https://user-images.githubusercontent.com/3187220/118215790-3830db80-b4ad-11eb-8b68-00578bc6c3c0.png)
 
@@ -51,6 +51,9 @@ $ make deploy
 
 # Scale out
 $ eb scale 3
+
+# Terminate resources on AWS
+$ make terminate
 ```
 
 ## Test
