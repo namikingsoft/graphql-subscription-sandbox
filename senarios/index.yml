@@ -1,0 +1,12 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60 # Test for 60 seconds
+      arrivalRate: 10 # Every second, add 10 users
+      rampTo: 100 # And ramp it up to 100 users in total over the 60s period
+      name: 'Ramping up the load'
+scenarios:
+  - name: 'load testing'
+    flow:
+      - get:
+          url: '/'
